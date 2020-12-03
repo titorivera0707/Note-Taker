@@ -1,10 +1,9 @@
 //Dependancies
 // We need to require all of our dependancies
 const express = require("express");
-const { fstat } = require("fs");
-const app = express;
+const fs = require("fs");
+const app = express();
 const path = require("path");
-const { report } = require("process");
 
 let num = 0
 // Global Variables
@@ -19,7 +18,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json())
 
 // we need a middlewear to have our css and javascript files to be loaded from our public files.
-app.use(express)
+app.use(express.static("public"))
 // Routes
 // HTML Routes here
 // We're gonna need to create a route to serve out HTML files so when we hit those endpoints, the browswer will serve the HTML to us.
@@ -28,12 +27,13 @@ app.use(express)
 // if we were to go the fs route we would need to use readfile to grab the data within the index/html and then res.send(data) to our front end
 // if we were to use res.sendFile
 // we are defining our home route, which takes in a callback
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public/index.html"))
-});
 
 app.get("/notes", (req, res) => {
     res.sendFile(path.join(__dirname, "public/notes.html"))
+});
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "public/index.html"))
 });
 // API routes here
 // our end goal is to return the data in db.json in our response
@@ -42,7 +42,17 @@ app.get("/notes", (req, res) => {
 // #2 we need to use the fswritefile so we can grab the data and send it to the front-end.
 
 app.get("/api/notes", (req, res) => {
-    rep.json(db)
+    res.json(db)
+})
+
+app.post("/api/notes", (req, res) => {
+    console.log(req.body)
+    db.push(req.body)
+    res.json(db)
+})
+
+app.delete("/api/notes/:id", (req, res) => {
+    const id = req.params.id
 })
 
 app.get("/api/test", (req, res) => {

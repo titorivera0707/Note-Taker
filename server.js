@@ -6,27 +6,13 @@ const app = express();
 const path = require("path");
 
 let num = 0
-// Global Variables
-// Declaring global 
 const PORT = process.env.PORT || 10000;
 const db = require("./db/db.json")
 console.log(db)
 
-// Middlewear
-// we need the urlencoded middle which gives us access to req.
 app.use(express.urlencoded({extended: true}));
 app.use(express.json())
-
-// we need a middlewear to have our css and javascript files to be loaded from our public files.
 app.use(express.static("public"))
-// Routes
-// HTML Routes here
-// We're gonna need to create a route to serve out HTML files so when we hit those endpoints, the browswer will serve the HTML to us.
-// Our goal is to display whats in the index.html to the root route i.e. PORT 10000.
-// fs module, path
-// if we were to go the fs route we would need to use readfile to grab the data within the index/html and then res.send(data) to our front end
-// if we were to use res.sendFile
-// we are defining our home route, which takes in a callback
 
 app.get("/notes", (req, res) => {
     res.sendFile(path.join(__dirname, "public/notes.html"))
@@ -35,24 +21,32 @@ app.get("/notes", (req, res) => {
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index.html"))
 });
-// API routes here
-// our end goal is to return the data in db.json in our response
-// what are our tools? we have express get, express post, express delete.
-// #1 we can make a variable to store the db.json file.
-// #2 we need to use the fswritefile so we can grab the data and send it to the front-end.
 
 app.get("/api/notes", (req, res) => {
     res.json(db)
 })
 
 app.post("/api/notes", (req, res) => {
-    console.log(req.body)
     db.push(req.body)
+    fs.writeFile("db/db.json", JSON.stringify(db), (err) => {
+        if (err) return console.log(err)
+        console.log("Information added")
+    })
     res.json(db)
 })
 
 app.delete("/api/notes/:id", (req, res) => {
     const id = req.params.id
+    for( let i = 0; i < db.length; i++) {
+        if(db[i].id === id) {
+            db.splice(i, 1);
+        }
+    }
+    fs.writeFile("db/db.json", JSON.stringify(db), (err) => {
+        if (err) return console.log(err)
+        console.log("Information deleted")
+    })
+    res.json(db)
 })
 
 app.get("/api/test", (req, res) => {
@@ -63,15 +57,8 @@ app.get("/api/test", (req, res) => {
         id: num
     }
     db.push(x)
-    // last step is to use fswritefile to write the db data back to the db.json file
     res.json(db)
 })
-
-// when doing a post request remember to console.log the req.
-// a post follows similar syntax using req and res as the call
-// because we declare our db at the very top
-
-// Server listener
 
 app.listen(PORT, () => {
     console.log("You started up the server!")

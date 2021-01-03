@@ -26,7 +26,13 @@ app.get("/api/notes/", (req, res) => {
 })
 
 app.post("/api/notes/", (req, res) => {
-    db.push(req.body)
+    num++
+    let newtodo = {
+        title: req.body.title,
+        text: req.body.text,
+        id: num
+    };
+    db.push(newtodo)
     fs.writeFile("db/db.json", JSON.stringify(db), (err) => {
         if (err) return console.log(err)
         console.log("Information added")
@@ -36,7 +42,7 @@ app.post("/api/notes/", (req, res) => {
 
 app.delete("/api/notes/:id", (req, res) => {
     const id = req.params.id
-            db.splice(id, 1);
+    db.splice(id-1, 1);
 
     fs.writeFile("./db/db.json", JSON.stringify(db), (err) => {
         if (err) return console.log(err)
@@ -44,6 +50,10 @@ app.delete("/api/notes/:id", (req, res) => {
         res.json(db)
     })
 })
+
+// app.get("/api/notes/:id", (req, res) => {
+//     const id = req.params.id
+// })
 
 app.get("/api/notes", (req, res) => {
     num++

@@ -35,7 +35,7 @@ app.post("/api/notes/", (req, res) => {
     db.push(newtodo)
     fs.writeFile("db/db.json", JSON.stringify(db), (err) => {
         if (err) return console.log(err)
-        console.log("Information added")
+        console.log("Information added");
     })
     res.end(JSON.stringify(db));
 })
